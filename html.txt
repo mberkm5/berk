@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dikkat Testi</title>
+    <script>
+        let score = 0;
+        let totalQuestions = 0;
+        let testRunning = false;
+
+        function startTest() {
+            document.getElementById("start-section").style.display = "none";
+            document.getElementById("test-section").style.display = "block";
+            testRunning = true;
+            generateTask();
+        }
+
+        function generateTask() {
+            if (!testRunning) return;
+
+            const taskType = Math.random() < 0.5 ? "visual" : "audio";
+            const correctResponse = Math.random() < 0.5;
+
+            if (taskType === "visual") {
+                const letter = correctResponse ? "A" : String.fromCharCode(66 + Math.floor(Math.random() * 24));
+                document.getElementById("task").innerText = letter;
+                document.getElementById("task").dataset.correct = correctResponse;
+            } else {
+                const audio = correctResponse ? "beep" : "buzz";
+                playAudio(audio);
+                document.getElementById("task").dataset.correct = correctResponse;
+                document.getElementById("task").innerText = "Dinle...";
+            }
+
+            totalQuestions++;
+
+            setTimeout(() => {
+                document.getElementById("task").innerText = "";
+                if (totalQuestions < 10) {
+                    generateTask();
+                } else {
+                    endTest();
+                }
+            }, 2000);
+        }
+
+        function playAudio(type) {
+            const audio = new Audio(type === "beep" ? "beep.mp3" : "buzz.mp3");
+            audio.play();
+        }
+
+        function handleResponse(response) {
+            const correct = document.getElementById("task").dataset.correct === "true";
+
+            if ((response && correct) || (!response && !correct)) {
+                score++;
+            } else {
+                score--;
+            }
+        }
+
+        function endTest() {
+            testRunning = false;
+            document.getElementById("test-section").style.display = "none";
+            document.getElementById("result-section").style.display = "block";
+            document.getElementById("score").innerText = `Puanınız: ${score}`;
+        }
+    </script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            padding: 20px;
+        }
+        #test-section, #result-section {
+            display: none;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            margin: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div id="start-section">
+        <h1>Dikkat Testi</h1>
+        <p>Bu testte görsel ve işitsel uyarılara doğru şekilde tepki vermeniz gerekecek. Hazır olduğunuzda teste başlayabilirsiniz.</p>
+        <button onclick="startTest()">Teste Başla</button>
+    </div>
+
+    <div id="test-section">
+        <h1>Dikkat Testi</h1>
+        <p id="task"></p>
+        <button onclick="handleResponse(true)">Tepki Ver</button>
+        <button onclick="handleResponse(false)">Tepki Verme</button>
+    </div>
+
+    <div id="result-section">
+        <h1>Sonuç</h1>
+        <p id="score"></p>
+        <button onclick="location.reload()">Tekrar Dene</button>
+    </div>
+</body>
+</html>
